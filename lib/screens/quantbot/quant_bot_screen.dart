@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import '../../api/quant_bot_api.dart';
 import '../../core/api_client.dart';
 import '../../models/quant_bot.dart';
+import '../../theme/app_colors.dart';
 import '../../widgets/glass_card.dart';
 
 class QuantBotScreen extends StatefulWidget {
@@ -143,7 +144,9 @@ class _QuantBotScreenState extends State<QuantBotScreen> {
           child: _StatCard(
             label: '누적 수익률',
             value: '${overview.cumulativeReturnPercent >= 0 ? '+' : ''}${overview.cumulativeReturnPercent.toStringAsFixed(2)}%',
-            color: overview.cumulativeReturnPercent >= 0 ? Colors.blue : Colors.red,
+            color: overview.cumulativeReturnPercent >= 0
+                ? context.appColors.marketRise
+                : context.appColors.marketFall,
           ),
         ),
         const SizedBox(width: 8),
@@ -178,7 +181,10 @@ class _QuantBotScreenState extends State<QuantBotScreen> {
                     Text('${_numberFormat.format(p.marketPrice)}원'),
                     Text(
                       '${p.pnl >= 0 ? '+' : ''}${_numberFormat.format(p.pnl)} (${(p.pnlRate * 100).toStringAsFixed(2)}%)',
-                      style: TextStyle(color: p.pnl >= 0 ? Colors.blue : Colors.red, fontSize: 12),
+                      style: TextStyle(
+                        color: p.pnl >= 0 ? context.appColors.marketRise : context.appColors.marketFall,
+                        fontSize: 12,
+                      ),
                     ),
                   ],
                 ),

@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import '../../../api/attendance_admin_api.dart';
 import '../../../core/api_client.dart';
 import '../../../models/attendance_session.dart';
+import '../../../theme/app_colors.dart';
 import '../../../widgets/glass_card.dart';
 import 'attendance_table_screen.dart';
 import 'qr_display_screen.dart';
@@ -123,7 +124,7 @@ class _AttendanceAdminScreenState extends State<AttendanceAdminScreen> {
           TextButton(onPressed: () => Navigator.of(context).pop(false), child: const Text('취소')),
           TextButton(
             onPressed: () => Navigator.of(context).pop(true),
-            child: const Text('삭제', style: TextStyle(color: Colors.red)),
+            child: Text('삭제', style: TextStyle(color: context.appColors.destructive)),
           ),
         ],
       ),
@@ -224,7 +225,7 @@ class _AttendanceAdminScreenState extends State<AttendanceAdminScreen> {
           TextButton(onPressed: () => Navigator.of(context).pop(false), child: const Text('취소')),
           TextButton(
             onPressed: () => Navigator.of(context).pop(true),
-            child: const Text('삭제', style: TextStyle(color: Colors.red)),
+            child: Text('삭제', style: TextStyle(color: context.appColors.destructive)),
           ),
         ],
       ),

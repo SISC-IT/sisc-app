@@ -6,6 +6,7 @@ import '../../api/board_api.dart';
 import '../../core/api_client.dart';
 import '../../models/board.dart';
 import '../../models/post.dart';
+import '../../theme/app_colors.dart';
 
 class PostWriteScreen extends StatefulWidget {
   const PostWriteScreen({
@@ -193,7 +194,7 @@ class _PostWriteScreenState extends State<PostWriteScreen> {
                 padding: const EdgeInsets.only(bottom: 12),
                 child: Text(
                   _errorMessage!,
-                  style: const TextStyle(color: Colors.red),
+                  style: TextStyle(color: context.appColors.destructive),
                   textAlign: TextAlign.center,
                 ),
               ),

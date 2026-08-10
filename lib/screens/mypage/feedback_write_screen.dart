@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../api/feedback_api.dart';
 import '../../core/api_client.dart';
+import '../../theme/app_colors.dart';
 
 class FeedbackWriteScreen extends StatefulWidget {
   const FeedbackWriteScreen({super.key});
@@ -74,7 +75,7 @@ class _FeedbackWriteScreenState extends State<FeedbackWriteScreen> {
             if (_errorMessage != null)
               Padding(
                 padding: const EdgeInsets.only(bottom: 12),
-                child: Text(_errorMessage!, style: const TextStyle(color: Colors.red)),
+                child: Text(_errorMessage!, style: TextStyle(color: context.appColors.destructive)),
               ),
             FilledButton(
               onPressed: _submitting ? null : _submit,

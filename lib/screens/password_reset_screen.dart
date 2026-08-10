@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../api/auth_api.dart';
 import '../core/api_client.dart';
+import '../theme/app_colors.dart';
 
 class PasswordResetScreen extends StatefulWidget {
   const PasswordResetScreen({super.key});
@@ -140,7 +141,7 @@ class _PasswordResetScreenState extends State<PasswordResetScreen> {
                 padding: const EdgeInsets.only(bottom: 12),
                 child: Text(
                   _errorMessage!,
-                  style: const TextStyle(color: Colors.red),
+                  style: TextStyle(color: context.appColors.destructive),
                   textAlign: TextAlign.center,
                 ),
               ),

@@ -4,6 +4,7 @@ import '../../api/betting_api.dart';
 import '../../core/api_client.dart';
 import '../../models/bet_round.dart';
 import '../../models/user_bet.dart';
+import '../../theme/app_colors.dart';
 import '../../widgets/glass_card.dart';
 
 class BettingCard extends StatefulWidget {
@@ -156,7 +157,7 @@ class _BettingCardState extends State<BettingCard> {
                           label: '상승 ↑',
                           points: _round!.upTotalPoints,
                           count: _round!.upBetCount,
-                          color: Colors.redAccent,
+                          color: context.appColors.marketRise,
                           selected: _myBet?.option == 'RISE',
                           onPressed: _acting ? null : () => _bet('RISE'),
                         ),
@@ -167,7 +168,7 @@ class _BettingCardState extends State<BettingCard> {
                           label: '하락 ↓',
                           points: _round!.downTotalPoints,
                           count: _round!.downBetCount,
-                          color: Colors.blueAccent,
+                          color: context.appColors.marketFall,
                           selected: _myBet?.option == 'FALL',
                           onPressed: _acting ? null : () => _bet('FALL'),
                         ),

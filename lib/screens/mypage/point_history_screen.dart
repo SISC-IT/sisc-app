@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import '../../api/point_api.dart';
 import '../../core/api_client.dart';
 import '../../models/point_history.dart';
+import '../../theme/app_colors.dart';
 
 class PointHistoryScreen extends StatefulWidget {
   const PointHistoryScreen({super.key});
@@ -120,7 +121,7 @@ class _PointHistoryScreenState extends State<PointHistoryScreen> {
                       trailing: Text(
                         '${positive ? '+' : ''}${item.amount} P',
                         style: TextStyle(
-                          color: positive ? Colors.blue : Colors.red,
+                          color: positive ? context.appColors.marketRise : context.appColors.marketFall,
                           fontWeight: FontWeight.bold,
                         ),
                       ),

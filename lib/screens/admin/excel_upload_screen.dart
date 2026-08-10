@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 import '../../api/admin_user_api.dart';
 import '../../core/api_client.dart';
+import '../../theme/app_colors.dart';
 import '../../widgets/glass_card.dart';
 
 class ExcelUploadScreen extends StatefulWidget {
@@ -76,7 +77,7 @@ class _ExcelUploadScreenState extends State<ExcelUploadScreen> {
             if (_errorMessage != null)
               Padding(
                 padding: const EdgeInsets.only(bottom: 12),
-                child: Text(_errorMessage!, style: const TextStyle(color: Colors.red)),
+                child: Text(_errorMessage!, style: TextStyle(color: context.appColors.destructive)),
               ),
             if (_result != null)
               GlassCard(

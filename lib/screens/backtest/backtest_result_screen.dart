@@ -7,6 +7,7 @@ import 'package:intl/intl.dart';
 import '../../api/backtest_api.dart';
 import '../../core/api_client.dart';
 import '../../models/backtest.dart';
+import '../../theme/app_colors.dart';
 import '../../widgets/glass_card.dart';
 
 class BacktestResultScreen extends StatefulWidget {
@@ -85,7 +86,7 @@ class _BacktestResultScreenState extends State<BacktestResultScreen> {
           TextButton(onPressed: () => Navigator.of(context).pop(false), child: const Text('취소')),
           TextButton(
             onPressed: () => Navigator.of(context).pop(true),
-            child: const Text('삭제', style: TextStyle(color: Colors.red)),
+            child: Text('삭제', style: TextStyle(color: context.appColors.destructive)),
           ),
         ],
       ),

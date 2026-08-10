@@ -4,6 +4,7 @@ import '../../api/email_api.dart';
 import '../../api/user_api.dart';
 import '../../core/api_client.dart';
 import '../../state/auth_state.dart';
+import '../../theme/app_colors.dart';
 
 class EditProfileScreen extends StatelessWidget {
   const EditProfileScreen({super.key, required this.authState});
@@ -177,7 +178,7 @@ class _EmailChangeTabState extends State<_EmailChangeTab> {
               padding: const EdgeInsets.only(bottom: 12),
               child: Text(
                 _message!,
-                style: TextStyle(color: _isError ? Colors.red : Colors.green),
+                style: TextStyle(color: _isError ? context.appColors.destructive : Colors.green),
                 textAlign: TextAlign.center,
               ),
             ),
@@ -317,7 +318,7 @@ class _PasswordChangeTabState extends State<_PasswordChangeTab> {
               padding: const EdgeInsets.only(bottom: 12),
               child: Text(
                 _message!,
-                style: TextStyle(color: _isError ? Colors.red : Colors.green),
+                style: TextStyle(color: _isError ? context.appColors.destructive : Colors.green),
                 textAlign: TextAlign.center,
               ),
             ),

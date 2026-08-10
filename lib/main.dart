@@ -5,6 +5,7 @@ import 'core/api_client.dart';
 import 'screens/home_screen.dart';
 import 'screens/login_screen.dart';
 import 'state/auth_state.dart';
+import 'theme/app_colors.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -141,5 +142,6 @@ ThemeData _buildDarkTheme() {
     textButtonTheme: TextButtonThemeData(
       style: TextButton.styleFrom(foregroundColor: Colors.white),
     ),
+    extensions: const [AppColors.dark],
   );
 }

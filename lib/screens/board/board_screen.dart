@@ -5,7 +5,10 @@ import '../../core/api_client.dart';
 import '../../models/board.dart';
 import '../../models/post.dart';
 import '../../state/auth_state.dart';
+import '../../theme/app_colors.dart';
 import '../../widgets/glass_bottom_nav_bar.dart';
+import '../../widgets/glass_card.dart';
+import '../../widgets/glass_fab.dart';
 import 'post_detail_screen.dart';
 import 'post_write_screen.dart';
 
@@ -276,7 +279,7 @@ class _BoardScreenState extends State<BoardScreen> with TickerProviderStateMixin
                             ),
                             TextButton(
                               onPressed: () => Navigator.of(context).pop(true),
-                              child: const Text('삭제', style: TextStyle(color: Colors.red)),
+                              child: Text('삭제', style: TextStyle(color: context.appColors.destructive)),
                             ),
                           ],
                         ),
@@ -316,10 +319,7 @@ class _BoardScreenState extends State<BoardScreen> with TickerProviderStateMixin
           ? null
           : Padding(
               padding: EdgeInsets.only(bottom: glassBottomBarClearance(context) - 16),
-              child: FloatingActionButton(
-                onPressed: _openWrite,
-                child: const Icon(Icons.edit),
-              ),
+              child: GlassFab(onPressed: _openWrite, icon: Icons.edit),
             ),
       body: _loadingBoards
           ? const Center(child: CircularProgressIndicator())
@@ -355,7 +355,11 @@ class _BoardScreenState extends State<BoardScreen> with TickerProviderStateMixin
                 ),
                 const SizedBox(height: 8),
                 Expanded(
-                  child: RefreshIndicator(
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
+                    child: GlassCard(
+                      margin: EdgeInsets.zero,
+                      child: RefreshIndicator(
                     onRefresh: _loadPosts,
                     child: _loadingPosts
                         ? const Center(child: CircularProgressIndicator())
@@ -425,7 +429,7 @@ class _BoardScreenState extends State<BoardScreen> with TickerProviderStateMixin
                                         Row(
                                           mainAxisSize: MainAxisSize.min,
                                           children: [
-                                            const Icon(Icons.favorite, size: 12, color: Colors.redAccent),
+                                            Icon(Icons.favorite, size: 12, color: context.appColors.socialLike),
                                             const SizedBox(width: 2),
                                             Text('${post.likeCount}', style: const TextStyle(fontSize: 12)),
                                             const SizedBox(width: 8),
@@ -455,6 +459,8 @@ class _BoardScreenState extends State<BoardScreen> with TickerProviderStateMixin
                               },
                             ),
                           ),
+                      ),
+                    ),
                   ),
                 ),
               ],

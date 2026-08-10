@@ -51,12 +51,12 @@ class GlassBottomNavBar extends StatelessWidget {
           child: Container(
             height: kGlassBottomBarHeight,
             decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.35),
+              color: Colors.white.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(kGlassBottomBarHeight / 2),
-              border: Border.all(color: Colors.white.withValues(alpha: 0.9), width: 1.5),
+              border: Border.all(color: Colors.white.withValues(alpha: 0.16), width: 1.5),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.12),
+                  color: Colors.black.withValues(alpha: 0.25),
                   blurRadius: 24,
                   offset: const Offset(0, 8),
                 ),
@@ -70,6 +70,7 @@ class GlassBottomNavBar extends StatelessWidget {
               child: LayoutBuilder(
                 builder: (context, constraints) {
                   final itemWidth = constraints.maxWidth / destinations.length;
+                  final primary = Theme.of(context).colorScheme.primary;
                   return Stack(
                     children: [
                       AnimatedPositioned(
@@ -82,11 +83,12 @@ class GlassBottomNavBar extends StatelessWidget {
                         child: DecoratedBox(
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
-                            color: Colors.white,
+                            color: primary.withValues(alpha: 0.22),
+                            border: Border.all(color: primary.withValues(alpha: 0.6), width: 1),
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.black.withValues(alpha: 0.15),
-                                blurRadius: 10,
+                                color: primary.withValues(alpha: 0.25),
+                                blurRadius: 12,
                                 offset: const Offset(0, 4),
                               ),
                             ],
@@ -131,9 +133,9 @@ class _GlassNavItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // 인디케이터가 항상 흰색이므로, 테마와 무관하게 흰 배경에서 또렷한 고정 색을 사용한다.
-    const activeColor = Colors.indigo;
-    const inactiveColor = Colors.black54;
+    // 내비게이션 바가 카드와 같은 다크 글래스 톤이므로, 테마의 primary/onSurface를 그대로 따른다.
+    final activeColor = Theme.of(context).colorScheme.primary;
+    final inactiveColor = Colors.white.withValues(alpha: 0.6);
     return MediaQuery(
       data: MediaQuery.of(context).copyWith(textScaler: TextScaler.noScaling),
       child: Semantics(

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../api/asset_management_api.dart';
 import '../../core/api_client.dart';
 import '../../models/asset_management.dart';
+import '../../theme/app_colors.dart';
 import '../../widgets/glass_card.dart';
 
 double? _parseNumber(String? value) {
@@ -35,7 +36,7 @@ String _formatQuantity(String? value) {
 Color _tone(String? value) {
   final n = _parseNumber(value);
   if (n == null || n == 0) return Colors.grey.shade400;
-  return n > 0 ? Colors.blue : Colors.red;
+  return n > 0 ? AppColors.dark.marketRise : AppColors.dark.marketFall;
 }
 
 class AssetManagementScreen extends StatefulWidget {

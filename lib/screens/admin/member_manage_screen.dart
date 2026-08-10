@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../api/admin_user_api.dart';
 import '../../core/api_client.dart';
 import '../../models/admin_user.dart';
+import '../../theme/app_colors.dart';
 
 class MemberManageScreen extends StatefulWidget {
   const MemberManageScreen({super.key});
@@ -131,7 +132,7 @@ class _MemberManageScreenState extends State<MemberManageScreen> {
           TextButton(onPressed: () => Navigator.of(context).pop(false), child: const Text('취소')),
           TextButton(
             onPressed: () => Navigator.of(context).pop(true),
-            child: const Text('탈퇴', style: TextStyle(color: Colors.red)),
+            child: Text('탈퇴', style: TextStyle(color: context.appColors.destructive)),
           ),
         ],
       ),

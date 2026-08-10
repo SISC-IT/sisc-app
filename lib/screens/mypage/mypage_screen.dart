@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../api/user_api.dart';
 import '../../core/api_client.dart';
 import '../../state/auth_state.dart';
+import '../../theme/app_colors.dart';
 import '../../widgets/glass_bottom_nav_bar.dart';
 import '../../widgets/glass_card.dart';
 import '../admin/admin_home_screen.dart';
@@ -38,7 +39,7 @@ class _MypageScreenState extends State<MypageScreen> {
           ),
           TextButton(
             onPressed: () => Navigator.of(context).pop(true),
-            child: const Text('탈퇴', style: TextStyle(color: Colors.red)),
+            child: Text('탈퇴', style: TextStyle(color: context.appColors.destructive)),
           ),
         ],
       ),
@@ -94,7 +95,7 @@ class _MypageScreenState extends State<MypageScreen> {
                   ),
                   Row(
                     children: [
-                      const Icon(Icons.monetization_on, color: Colors.amber, size: 18),
+                      Icon(Icons.monetization_on, color: context.appColors.pointValue, size: 18),
                       const SizedBox(width: 4),
                       Text('${user?.point ?? 0} P', style: const TextStyle(fontWeight: FontWeight.bold)),
                     ],
@@ -186,7 +187,7 @@ class _MypageScreenState extends State<MypageScreen> {
           const SizedBox(height: 8),
           TextButton(
             onPressed: _withdrawing ? null : _confirmWithdraw,
-            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            style: TextButton.styleFrom(foregroundColor: context.appColors.destructive),
             child: _withdrawing
                 ? const SizedBox(
                     height: 16,

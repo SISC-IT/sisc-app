@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../api/public_page_api.dart';
 import '../../core/api_client.dart';
+import '../../theme/app_colors.dart';
 
 class PublicPagesScreen extends StatefulWidget {
   const PublicPagesScreen({super.key});
@@ -149,7 +150,7 @@ class _PublicPageEditorState extends State<_PublicPageEditor> {
           if (_message != null)
             Padding(
               padding: const EdgeInsets.only(bottom: 12),
-              child: Text(_message!, style: TextStyle(color: _isError ? Colors.red : Colors.green)),
+              child: Text(_message!, style: TextStyle(color: _isError ? context.appColors.destructive : Colors.green)),
             ),
           FilledButton(
             onPressed: _saving ? null : _save,

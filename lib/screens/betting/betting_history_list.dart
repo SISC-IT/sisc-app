@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import '../../api/betting_api.dart';
 import '../../core/api_client.dart';
 import '../../models/user_bet.dart';
+import '../../theme/app_colors.dart';
 
 class BettingHistoryTabs extends StatefulWidget {
   const BettingHistoryTabs({super.key});
@@ -117,7 +118,7 @@ class _HistoryTile extends StatelessWidget {
     } else if (bet.isCorrect == true) {
       resultIcon = const Icon(Icons.check_circle, color: Colors.green);
     } else {
-      resultIcon = const Icon(Icons.cancel, color: Colors.red);
+      resultIcon = Icon(Icons.cancel, color: context.appColors.destructive);
     }
 
     return ListTile(
@@ -133,7 +134,9 @@ class _HistoryTile extends StatelessWidget {
           ? Text(
               '${bet.earnedPoints! >= 0 ? '+' : ''}${_numberFormat.format(bet.earnedPoints)} P',
               style: TextStyle(
-                color: bet.earnedPoints! >= 0 ? Colors.blue : Colors.red,
+                color: bet.earnedPoints! >= 0
+                    ? context.appColors.marketRise
+                    : context.appColors.marketFall,
                 fontWeight: FontWeight.bold,
               ),
             )

@@ -10,6 +10,7 @@ import '../../models/board.dart';
 import '../../models/comment.dart';
 import '../../models/post.dart';
 import '../../state/auth_state.dart';
+import '../../theme/app_colors.dart';
 import 'post_write_screen.dart';
 
 class PostDetailScreen extends StatefulWidget {
@@ -117,7 +118,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
           TextButton(onPressed: () => Navigator.of(context).pop(false), child: const Text('취소')),
           TextButton(
             onPressed: () => Navigator.of(context).pop(true),
-            child: const Text('삭제', style: TextStyle(color: Colors.red)),
+            child: Text('삭제', style: TextStyle(color: context.appColors.destructive)),
           ),
         ],
       ),
@@ -199,7 +200,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
           TextButton(onPressed: () => Navigator.of(context).pop(false), child: const Text('취소')),
           TextButton(
             onPressed: () => Navigator.of(context).pop(true),
-            child: const Text('삭제', style: TextStyle(color: Colors.red)),
+            child: Text('삭제', style: TextStyle(color: context.appColors.destructive)),
           ),
         ],
       ),
@@ -259,7 +260,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                 TextButton(
                   onPressed: () => _deleteComment(comment),
                   style: TextButton.styleFrom(padding: EdgeInsets.zero, minimumSize: const Size(0, 32)),
-                  child: const Text('삭제', style: TextStyle(fontSize: 12, color: Colors.red)),
+                  child: Text('삭제', style: TextStyle(fontSize: 12, color: context.appColors.destructive)),
                 ),
               ],
             ],
@@ -339,7 +340,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                       IconButton(
                         icon: Icon(
                           _post!.isLiked ? Icons.favorite : Icons.favorite_border,
-                          color: _post!.isLiked ? Colors.redAccent : null,
+                          color: _post!.isLiked ? context.appColors.socialLike : null,
                         ),
                         onPressed: _toggleLike,
                       ),

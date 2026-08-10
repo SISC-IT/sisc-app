@@ -4,6 +4,7 @@ import '../../api/backtest_api.dart';
 import '../../core/api_client.dart';
 import '../../data/indicator_dictionary.dart';
 import '../../models/strategy_builder.dart';
+import '../../theme/app_colors.dart';
 import '../../widgets/glass_card.dart';
 import 'backtest_result_screen.dart';
 import 'template_list_screen.dart';
@@ -222,7 +223,7 @@ class _BacktestBuilderScreenState extends State<BacktestBuilderScreen> {
                 padding: const EdgeInsets.only(bottom: 12),
                 child: Text(
                   _errorMessage!,
-                  style: const TextStyle(color: Colors.red),
+                  style: TextStyle(color: context.appColors.destructive),
                   textAlign: TextAlign.center,
                 ),
               ),

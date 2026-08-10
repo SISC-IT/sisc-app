@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../api/admin_user_api.dart';
 import '../../core/api_client.dart';
 import '../../models/admin_user.dart';
+import '../../theme/app_colors.dart';
 
 class MemberApprovalScreen extends StatefulWidget {
   const MemberApprovalScreen({super.key});
@@ -59,7 +60,7 @@ class _MemberApprovalScreenState extends State<MemberApprovalScreen> {
           TextButton(onPressed: () => Navigator.of(context).pop(false), child: const Text('취소')),
           TextButton(
             onPressed: () => Navigator.of(context).pop(true),
-            child: const Text('거절', style: TextStyle(color: Colors.red)),
+            child: Text('거절', style: TextStyle(color: context.appColors.destructive)),
           ),
         ],
       ),
@@ -124,7 +125,7 @@ class _MemberApprovalScreenState extends State<MemberApprovalScreen> {
                         onPressed: () => _approve(user),
                       ),
                       IconButton(
-                        icon: const Icon(Icons.cancel_outlined, color: Colors.red),
+                        icon: Icon(Icons.cancel_outlined, color: context.appColors.destructive),
                         onPressed: () => _reject(user),
                       ),
                     ],

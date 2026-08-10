@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../widgets/brand_gradient_text.dart';
 import '../../widgets/glass_bottom_nav_bar.dart';
 
 /// 프론트엔드 홈 화면(Home.jsx)과 동일한 톤의 히어로 화면.
@@ -29,28 +30,14 @@ class HomeTab extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 20),
-                ShaderMask(
-                  shaderCallback: (bounds) => const LinearGradient(
-                    begin: Alignment.bottomRight,
-                    end: Alignment.topLeft,
-                    colors: [
-                      Color(0xFF5B93ED),
-                      Color(0xFF78B4F3),
-                      Color(0xFFB2F4FF),
-                      Color(0xFFFCFFFF),
-                    ],
-                    stops: [0.19, 0.49, 0.59, 1.0],
-                  ).createShader(bounds),
-                  child: const Text(
-                    '세투연과 함께 세상을 읽고 미래에 투자하라',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                      height: 1.4,
-                      letterSpacing: -0.1,
-                    ),
+                const BrandGradientText(
+                  '세투연과 함께 세상을 읽고 미래에 투자하라',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    height: 1.4,
+                    letterSpacing: -0.1,
                   ),
                 ),
               ],
