@@ -13,7 +13,24 @@ class QrScanScreen extends StatefulWidget {
 
 class _QrScanScreenState extends State<QrScanScreen> {
   final _attendanceApi = AttendanceApi(ApiClient.instance);
+  late MobileScannerController _controller;
   bool _processing = false;
+  double _zoomLevel = 0.0;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = MobileScannerController(
+      facing: CameraFacing.back,
+      torchEnabled: false,
+    );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
 
   Future<void> _onDetect(BarcodeCapture capture) async {
     if (_processing) return;
@@ -48,24 +65,72 @@ class _QrScanScreenState extends State<QrScanScreen> {
     Navigator.of(context).pop();
   }
 
+  void _toggleTorch() {
+    _controller.toggleTorch();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('QR 스캔')),
       body: Stack(
         children: [
-          MobileScanner(onDetect: _onDetect),
+          MobileScanner(
+            controller: _controller,
+            onDetect: _onDetect,
+          ),
           if (_processing)
             const ColoredBox(
               color: Colors.black45,
               child: Center(child: CircularProgressIndicator()),
             ),
+          Positioned(
+            bottom: 20,
+            left: 20,
+            right: 20,
+            child: Column(
+              children: [
+                Row(
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            '카메라 줌',
+                            style: TextStyle(color: Colors.white),
+                          ),
+                          Slider(
+                            value: _zoomLevel,
+                            onChanged: (value) async {
+                              setState(() => _zoomLevel = value);
+                              await _controller.setZoomScale(value);
+                            },
+                            min: 0.0,
+                            max: 1.0,
+                            divisions: 10,
+                            label: '${(_zoomLevel * 100).toStringAsFixed(0)}%',
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                ElevatedButton.icon(
+                  onPressed: _toggleTorch,
+                  icon: const Icon(Icons.flashlight_on),
+                  label: const Text('손전등'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.grey[800],
+                    foregroundColor: Colors.white,
+                  ),
+                ),
+              ],
+            ),
+          ),
         ],
       ),
     );
   }
-}
-
-extension _FirstOrNull<T> on List<T> {
-  T? get firstOrNull => isEmpty ? null : first;
 }
