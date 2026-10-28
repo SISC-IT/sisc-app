@@ -5,9 +5,6 @@ workflows:
     integrations:
       app_store_connect: sumtagi-appstore
     environment:
-      ios_signing:
-        distribution_type: app_store
-        bundle_identifier: kr.sisc.siscApp
       vars:
         BUNDLE_ID: "kr.sisc.siscApp"
         XCODE_WORKSPACE: "Runner.xcworkspace"
