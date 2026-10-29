@@ -23,19 +23,34 @@ workflows:
         script: |
           set -e
 
-          CERT_JSON=$(app-store-connect certificates list \
+          rm -f "$HOME/Library/Developer/Xcode/UserData/Certificates/"*.p12
+
+          app-store-connect certificates list \
             --type DISTRIBUTION \
             --certificate-key "$CERTIFICATE_PRIVATE_KEY" \
-            --save --json)
-          CERT_ID=$(echo "$CERT_JSON" | jq -r '.[0].id // empty')
+            --save
 
-          if [ -z "$CERT_ID" ]; then
-            CERT_ID=$(app-store-connect certificates create \
+          P12_FILE=$(ls "$HOME/Library/Developer/Xcode/UserData/Certificates/"*.p12 2>/dev/null | head -1)
+
+          if [ -z "$P12_FILE" ]; then
+            echo "No existing certificate matches our key, creating a new one"
+            app-store-connect certificates create \
               --type DISTRIBUTION \
               --certificate-key "$CERTIFICATE_PRIVATE_KEY" \
-              --save --json | jq -r '.id')
+              --save
+            P12_FILE=$(ls "$HOME/Library/Developer/Xcode/UserData/Certificates/"*.p12 | head -1)
           fi
-          echo "Using certificate: $CERT_ID"
+
+          # certificates list/create --save names the file
+          # "DISTRIBUTION_<CERT_ID>_<random>.p12" - that ID is the one
+          # codemagic-cli-tools actually matched to our private key
+          # (--json's .[0].id is NOT filtered by --certificate-key and
+          # was silently returning an unrelated certificate's id, which
+          # is why every exported profile pointed at the wrong cert).
+          BASENAME=$(basename "$P12_FILE" .p12)
+          REST=${BASENAME#DISTRIBUTION_}
+          CERT_ID=${REST%%_*}
+          echo "Resolved certificate ID from saved p12 ($P12_FILE): $CERT_ID"
 
           BUNDLE_RESOURCE_ID=$(app-store-connect bundle-ids list \
             --bundle-id-identifier "$BUNDLE_ID" \
