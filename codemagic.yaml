@@ -7,9 +7,6 @@ workflows:
     environment:
       groups:
         - sisc
-      ios_signing:
-        distribution_type: app_store
-        bundle_identifier: kr.sisc.siscApp
       vars:
         BUNDLE_ID: "kr.sisc.siscApp"
         XCODE_WORKSPACE: "Runner.xcworkspace"
@@ -22,6 +19,84 @@ workflows:
         script: |
           flutter packages pub get
 
+      - name: Fetch signing files
+        script: |
+          set -e
+
+          CERT_JSON=$(app-store-connect certificates list \
+            --type DISTRIBUTION \
+            --certificate-key "$CERTIFICATE_PRIVATE_KEY" \
+            --save --json)
+          CERT_ID=$(echo "$CERT_JSON" | jq -r '.[0].id // empty')
+
+          if [ -z "$CERT_ID" ]; then
+            CERT_ID=$(app-store-connect certificates create \
+              --type DISTRIBUTION \
+              --certificate-key "$CERTIFICATE_PRIVATE_KEY" \
+              --save --json | jq -r '.id')
+          fi
+          echo "Using certificate: $CERT_ID"
+
+          BUNDLE_RESOURCE_ID=$(app-store-connect bundle-ids list \
+            --bundle-id-identifier "$BUNDLE_ID" \
+            --strict-match-identifier --json | jq -r '.[0].id')
+          echo "Bundle ID resource: $BUNDLE_RESOURCE_ID"
+
+          PROFILE_NAME="SISC App Store $(date +%s)"
+          app-store-connect profiles create "$BUNDLE_RESOURCE_ID" \
+            --certificate-ids="$CERT_ID" \
+            --type=IOS_APP_STORE \
+            --name="$PROFILE_NAME" \
+            --save
+          echo "$PROFILE_NAME" > /tmp/profile_name.txt
+
+      - name: Install Apple WWDR intermediate certificates
+        script: |
+          for cer in AppleWWDRCAG2 AppleWWDRCAG3 AppleWWDRCAG4 AppleWWDRCAG5 AppleWWDRCAG6; do
+            curl -sLo "/tmp/$cer.cer" "https://www.apple.com/certificateauthority/$cer.cer"
+            security import "/tmp/$cer.cer" || true
+          done
+
+      - name: Add certificates to keychain
+        script: |
+          keychain add-certificates
+
+      - name: DEBUG - dump keychain identities and profile contents
+        script: |
+          echo "=== security find-identity -p codesigning -v ==="
+          security find-identity -p codesigning -v || true
+
+          echo ""
+          echo "=== Saved certificates dir ==="
+          ls -la "$HOME/Library/Developer/Xcode/UserData/Certificates/" || true
+
+          echo ""
+          echo "=== Saved profiles dir ==="
+          ls -la "$HOME/Library/Developer/Xcode/UserData/Provisioning Profiles/" || true
+
+          echo ""
+          echo "=== Decoded profile(s) DeveloperCertificates ==="
+          for p in "$HOME/Library/Developer/Xcode/UserData/Provisioning Profiles/"*.mobileprovision; do
+            echo "--- $p ---"
+            security cms -D -i "$p" | plutil -extract DeveloperCertificates xml1 -o - - 2>/dev/null \
+              | grep -A1 'data' | grep -v 'data\|--' \
+              | while read -r b64; do
+                  echo "$b64" | base64 -d | openssl x509 -inform DER -noout -subject -fingerprint 2>/dev/null
+                done
+          done
+
+          echo ""
+          echo "=== Our CERTIFICATE_PRIVATE_KEY public key fingerprint ==="
+          echo "$CERTIFICATE_PRIVATE_KEY" | openssl rsa -pubout 2>/dev/null | openssl md5
+
+          echo ""
+          echo "=== Each keychain cert's public key fingerprint (to find the match) ==="
+          for p12 in "$HOME/Library/Developer/Xcode/UserData/Certificates/"*.p12; do
+            echo "--- $p12 ---"
+            openssl pkcs12 -in "$p12" -nodes -passin pass: 2>/dev/null \
+              | openssl x509 -noout -pubkey 2>/dev/null | openssl md5
+          done
+
       - name: Set up code signing settings on Xcode project
         script: |
           xcode-project use-profiles
@@ -30,9 +105,34 @@ workflows:
         script: |
           find . -name "Podfile" -maxdepth 2 -execdir pod install \;
 
+      - name: Set up export options plist
+        script: |
+          PROFILE_NAME=$(cat /tmp/profile_name.txt)
+          cat > /Users/builder/export_options.plist <<PLIST
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+              <key>method</key>
+              <string>app-store</string>
+              <key>teamID</key>
+              <string>5P4GP446SF</string>
+              <key>signingStyle</key>
+              <string>manual</string>
+              <key>provisioningProfiles</key>
+              <dict>
+                  <key>$BUNDLE_ID</key>
+                  <string>$PROFILE_NAME</string>
+              </dict>
+          </dict>
+          </plist>
+          PLIST
+          cat /Users/builder/export_options.plist
+
       - name: Flutter build ipa
         script: |
-          flutter build ipa --release
+          flutter build ipa --release \
+            --export-options-plist=/Users/builder/export_options.plist
 
     artifacts:
       - build/ios/ipa/*.ipa
