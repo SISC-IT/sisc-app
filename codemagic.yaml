@@ -21,9 +21,35 @@ workflows:
 
       - name: Fetch signing files
         script: |
-          app-store-connect fetch-signing-files "$BUNDLE_ID" \
-            --type IOS_APP_STORE \
-            --create
+          set -e
+
+          CERT_JSON=$(app-store-connect certificates list \
+            --type DISTRIBUTION \
+            --certificate-key "$CERTIFICATE_PRIVATE_KEY" \
+            --save --json)
+          CERT_ID=$(echo "$CERT_JSON" | jq -r '.[0].id // empty')
+
+          if [ -z "$CERT_ID" ]; then
+            CERT_ID=$(app-store-connect certificates create \
+              --type DISTRIBUTION \
+              --certificate-key "$CERTIFICATE_PRIVATE_KEY" \
+              --save --json | jq -r '.id')
+          fi
+          echo "Using certificate: $CERT_ID"
+
+          BUNDLE_RESOURCE_ID=$(app-store-connect bundle-ids list \
+            --bundle-id-identifier "$BUNDLE_ID" \
+            --strict-match-identifier --json | jq -r '.[0].id')
+          echo "Bundle ID resource: $BUNDLE_RESOURCE_ID"
+
+          # Profile is bound to exactly this certificate only, so the keychain
+          # never has to choose between it and the unrelated existing
+          # certificate that Codemagic doesn't hold the private key for.
+          app-store-connect profiles create "$BUNDLE_RESOURCE_ID" \
+            --certificate-ids="$CERT_ID" \
+            --type=IOS_APP_STORE \
+            --name="SISC App Store $(date +%s)" \
+            --save
 
       - name: Install Apple WWDR intermediate certificates
         script: |
