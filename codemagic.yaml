@@ -25,6 +25,13 @@ workflows:
             --type IOS_APP_STORE \
             --create
 
+      - name: Install Apple WWDR intermediate certificates
+        script: |
+          for cer in AppleWWDRCAG2 AppleWWDRCAG3 AppleWWDRCAG4 AppleWWDRCAG5 AppleWWDRCAG6; do
+            curl -sLo "/tmp/$cer.cer" "https://www.apple.com/certificateauthority/$cer.cer"
+            security import "/tmp/$cer.cer" || true
+          done
+
       - name: Add certificates to keychain
         script: |
           keychain add-certificates
