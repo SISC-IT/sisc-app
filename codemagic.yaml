@@ -66,12 +66,18 @@ workflows:
           echo "$PROFILE_NAME" > /tmp/profile_name.txt
           echo "$CERT_ID" > /tmp/cert_id.txt
 
-      - name: Install Apple WWDR intermediate certificates
+      - name: Install Apple WWDR intermediate and root certificates
         script: |
           for cer in AppleWWDRCAG2 AppleWWDRCAG3 AppleWWDRCAG4 AppleWWDRCAG5 AppleWWDRCAG6; do
             curl -sLo "/tmp/$cer.cer" "https://www.apple.com/certificateauthority/$cer.cer"
             security import "/tmp/$cer.cer" || true
           done
+          curl -sLo "/tmp/AppleRootCA-G2.cer" "https://www.apple.com/certificateauthority/AppleRootCA-G2.cer"
+          curl -sLo "/tmp/AppleRootCA-G3.cer" "https://www.apple.com/certificateauthority/AppleRootCA-G3.cer"
+          curl -sLo "/tmp/AppleIncRootCertificate.cer" "https://www.apple.com/appleca/AppleIncRootCertificate.cer"
+          security import "/tmp/AppleRootCA-G2.cer" || true
+          security import "/tmp/AppleRootCA-G3.cer" || true
+          security import "/tmp/AppleIncRootCertificate.cer" || true
 
       - name: Add certificates to keychain
         script: |
