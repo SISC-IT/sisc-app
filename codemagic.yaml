@@ -12,7 +12,7 @@ workflows:
         XCODE_WORKSPACE: "Runner.xcworkspace"
         XCODE_SCHEME: "Runner"
       flutter: stable
-      xcode: latest
+      xcode: 16.4
       cocoapods: default
     scripts:
       - name: Get Flutter packages
