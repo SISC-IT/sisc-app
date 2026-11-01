@@ -5,12 +5,14 @@ workflows:
     integrations:
       app_store_connect: sumtagi-appstore
     environment:
+      groups:
+        - sisc
       vars:
         BUNDLE_ID: "kr.sisc.siscApp"
         XCODE_WORKSPACE: "Runner.xcworkspace"
         XCODE_SCHEME: "Runner"
       flutter: stable
-      xcode: latest
+      xcode: 16.4
       cocoapods: default
     scripts:
       - name: Get Flutter packages
@@ -19,13 +21,99 @@ workflows:
 
       - name: Fetch signing files
         script: |
-          app-store-connect fetch-signing-files "$BUNDLE_ID" \
-            --type IOS_APP_STORE \
-            --create
+          set -e
+
+          rm -f "$HOME/Library/Developer/Xcode/UserData/Certificates/"*.p12
+
+          app-store-connect certificates list \
+            --type DISTRIBUTION \
+            --certificate-key "$CERTIFICATE_PRIVATE_KEY" \
+            --save
+
+          P12_FILE=$(ls "$HOME/Library/Developer/Xcode/UserData/Certificates/"*.p12 2>/dev/null | head -1)
+
+          if [ -z "$P12_FILE" ]; then
+            echo "No existing certificate matches our key, creating a new one"
+            app-store-connect certificates create \
+              --type DISTRIBUTION \
+              --certificate-key "$CERTIFICATE_PRIVATE_KEY" \
+              --save
+            P12_FILE=$(ls "$HOME/Library/Developer/Xcode/UserData/Certificates/"*.p12 | head -1)
+          fi
+
+          # certificates list/create --save names the file
+          # "DISTRIBUTION_<CERT_ID>_<random>.p12" - that ID is the one
+          # codemagic-cli-tools actually matched to our private key
+          # (--json's .[0].id is NOT filtered by --certificate-key and
+          # was silently returning an unrelated certificate's id, which
+          # is why every exported profile pointed at the wrong cert).
+          BASENAME=$(basename "$P12_FILE" .p12)
+          REST=${BASENAME#DISTRIBUTION_}
+          CERT_ID=${REST%%_*}
+          echo "Resolved certificate ID from saved p12 ($P12_FILE): $CERT_ID"
+
+          BUNDLE_RESOURCE_ID=$(app-store-connect bundle-ids list \
+            --bundle-id-identifier "$BUNDLE_ID" \
+            --strict-match-identifier --json | jq -r '.[0].id')
+          echo "Bundle ID resource: $BUNDLE_RESOURCE_ID"
+
+          PROFILE_NAME="SISC App Store $(date +%s)"
+          app-store-connect profiles create "$BUNDLE_RESOURCE_ID" \
+            --certificate-ids="$CERT_ID" \
+            --type=IOS_APP_STORE \
+            --name="$PROFILE_NAME" \
+            --save
+          echo "$PROFILE_NAME" > /tmp/profile_name.txt
+          echo "$CERT_ID" > /tmp/cert_id.txt
+
+      - name: Install Apple WWDR intermediate and root certificates
+        script: |
+          DEFAULT_KEYCHAIN=$(security default-keychain | xargs)
+          echo "Importing into default keychain: $DEFAULT_KEYCHAIN"
+
+          for cer in AppleWWDRCAG2 AppleWWDRCAG3 AppleWWDRCAG4 AppleWWDRCAG5 AppleWWDRCAG6; do
+            curl -sLo "/tmp/$cer.cer" "https://www.apple.com/certificateauthority/$cer.cer"
+            security import "/tmp/$cer.cer" -k "$DEFAULT_KEYCHAIN" || true
+          done
+          curl -sLo "/tmp/AppleRootCA-G2.cer" "https://www.apple.com/certificateauthority/AppleRootCA-G2.cer"
+          curl -sLo "/tmp/AppleRootCA-G3.cer" "https://www.apple.com/certificateauthority/AppleRootCA-G3.cer"
+          curl -sLo "/tmp/AppleIncRootCertificate.cer" "https://www.apple.com/appleca/AppleIncRootCertificate.cer"
+          security import "/tmp/AppleRootCA-G2.cer" -k "$DEFAULT_KEYCHAIN" || true
+          security import "/tmp/AppleRootCA-G3.cer" -k "$DEFAULT_KEYCHAIN" || true
+          security import "/tmp/AppleIncRootCertificate.cer" -k "$DEFAULT_KEYCHAIN" || true
 
       - name: Add certificates to keychain
         script: |
-          keychain add-certificates
+          DEFAULT_KEYCHAIN=$(security default-keychain | xargs)
+          echo "Adding identity into default keychain: $DEFAULT_KEYCHAIN"
+          keychain add-certificates -p "$DEFAULT_KEYCHAIN"
+
+      - name: DEBUG - dump keychain identities and profile contents
+        script: |
+          echo "=== Cert ID we told Apple to attach ==="
+          cat /tmp/cert_id.txt
+
+          echo ""
+          echo "=== Profile name we created ==="
+          cat /tmp/profile_name.txt
+
+          echo ""
+          echo "=== security find-identity -p codesigning -v ==="
+          security find-identity -p codesigning -v || true
+
+          echo ""
+          echo "=== Decoded profile contents ==="
+          for p in "$HOME/Library/Developer/Xcode/UserData/Provisioning Profiles/"*.mobileprovision; do
+            echo "--- $p ---"
+            security cms -D -i "$p" > /tmp/profile.plist
+            rm -f /tmp/profile_cert_*.der
+            python3 -c "import plistlib; d = plistlib.load(open('/tmp/profile.plist','rb')); print('Name:', d.get('Name')); print('UUID:', d.get('UUID')); print('TeamIdentifier:', d.get('TeamIdentifier')); certs = d.get('DeveloperCertificates', []); print('Certificate count:', len(certs)); [open('/tmp/profile_cert_%d.der' % i, 'wb').write(c) for i, c in enumerate(certs)]"
+            for der in /tmp/profile_cert_*.der; do
+              [ -e "$der" ] || continue
+              echo "  $der:"
+              openssl x509 -inform DER -in "$der" -noout -subject -fingerprint -sha1
+            done
+          done
 
       - name: Set up code signing settings on Xcode project
         script: |
@@ -34,6 +122,30 @@ workflows:
       - name: Install CocoaPods dependencies
         script: |
           find . -name "Podfile" -maxdepth 2 -execdir pod install \;
+
+      - name: Set up export options plist
+        script: |
+          PROFILE_NAME=$(cat /tmp/profile_name.txt)
+          cat > /Users/builder/export_options.plist <<PLIST
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+              <key>method</key>
+              <string>app-store</string>
+              <key>teamID</key>
+              <string>5P4GP446SF</string>
+              <key>signingStyle</key>
+              <string>manual</string>
+              <key>provisioningProfiles</key>
+              <dict>
+                  <key>$BUNDLE_ID</key>
+                  <string>$PROFILE_NAME</string>
+              </dict>
+          </dict>
+          </plist>
+          PLIST
+          cat /Users/builder/export_options.plist
 
       - name: Flutter build ipa
         script: |
