@@ -28,6 +28,10 @@ workflows:
         script: |
           find . -name "Podfile" -maxdepth 2 -execdir pod install \;
 
+      - name: Set up code signing settings on Xcode project
+        script: |
+          xcode-project use-profiles
+
       - name: Flutter build ipa
         script: |
           flutter build ipa --release \
