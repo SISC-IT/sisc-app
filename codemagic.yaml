@@ -14,7 +14,7 @@ workflows:
         XCODE_WORKSPACE: "Runner.xcworkspace"
         XCODE_SCHEME: "Runner"
       flutter: stable
-      xcode: 16.4
+      xcode: latest
       cocoapods: default
     cache:
       cache_paths:
