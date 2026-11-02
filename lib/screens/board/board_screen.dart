@@ -5,6 +5,7 @@ import '../../core/api_client.dart';
 import '../../models/board.dart';
 import '../../models/post.dart';
 import '../../state/auth_state.dart';
+import '../../theme/app_colors.dart';
 import '../../widgets/glass_bottom_nav_bar.dart';
 import 'post_detail_screen.dart';
 import 'post_write_screen.dart';
@@ -332,7 +333,7 @@ class _BoardScreenState extends State<BoardScreen> with TickerProviderStateMixin
                   isScrollable: true,
                   tabAlignment: TabAlignment.start,
                   labelColor: Theme.of(context).colorScheme.primary,
-                  unselectedLabelColor: Colors.white60,
+                  unselectedLabelColor: AppColors.textSecondary,
                   onTap: (index) =>
                       _selectBoard(index == 0 ? null : _selectableBoards[index - 1]),
                   tabs: [

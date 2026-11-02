@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../api/auth_api.dart';
 import '../api/email_api.dart';
 import '../core/api_client.dart';
+import '../theme/app_colors.dart';
 
 class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});
@@ -222,13 +223,13 @@ class _SignupScreenState extends State<SignupScreen> {
                           style: TextStyle(
                             fontSize: 11,
                             color: rule.test(_passwordController.text)
-                                ? Colors.lightGreenAccent
-                                : Colors.white60,
+                                ? AppColors.down
+                                : AppColors.textSecondary,
                           ),
                         ),
                         backgroundColor: rule.test(_passwordController.text)
-                            ? Colors.green.withValues(alpha: 0.25)
-                            : Colors.white.withValues(alpha: 0.08),
+                            ? AppColors.down.withValues(alpha: 0.12)
+                            : AppColors.border,
                       ),
                     )
                     .toList(),

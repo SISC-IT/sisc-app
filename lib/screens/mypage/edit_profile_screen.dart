@@ -4,6 +4,7 @@ import '../../api/email_api.dart';
 import '../../api/user_api.dart';
 import '../../core/api_client.dart';
 import '../../state/auth_state.dart';
+import '../../theme/app_colors.dart';
 
 class EditProfileScreen extends StatelessWidget {
   const EditProfileScreen({super.key, required this.authState});
@@ -293,13 +294,13 @@ class _PasswordChangeTabState extends State<_PasswordChangeTab> {
                         style: TextStyle(
                           fontSize: 11,
                           color: rule.test(_newPasswordController.text)
-                              ? Colors.lightGreenAccent
-                              : Colors.white60,
+                              ? AppColors.down
+                              : AppColors.textSecondary,
                         ),
                       ),
                       backgroundColor: rule.test(_newPasswordController.text)
-                          ? Colors.green.withValues(alpha: 0.25)
-                          : Colors.white.withValues(alpha: 0.08),
+                          ? AppColors.down.withValues(alpha: 0.12)
+                          : AppColors.border,
                     ),
                   )
                   .toList(),

@@ -5,6 +5,7 @@ import 'core/api_client.dart';
 import 'screens/home_screen.dart';
 import 'screens/login_screen.dart';
 import 'state/auth_state.dart';
+import 'theme/app_colors.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -24,21 +25,14 @@ class SiscApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'SISC',
-      theme: _buildDarkTheme(),
-      builder: (context, child) => Stack(
-        fit: StackFit.expand,
-        children: [
-          Image.asset('assets/images/home_background.png', fit: BoxFit.cover),
-          if (child != null) child,
-        ],
-      ),
+      theme: _buildLightTheme(),
       home: ListenableBuilder(
         listenable: authState,
         builder: (context, _) {
           switch (authState.status) {
             case AuthStatus.unknown:
               return const Scaffold(
-                backgroundColor: Colors.transparent,
+                backgroundColor: AppColors.bg,
                 body: Center(child: CircularProgressIndicator()),
               );
             case AuthStatus.loggedOut:
@@ -52,57 +46,54 @@ class SiscApp extends StatelessWidget {
   }
 }
 
-ThemeData _buildDarkTheme() {
-  const background = Color(0xFF070B1E);
-  final glassFill = Colors.white.withValues(alpha: 0.06);
-  final glassBorder = Colors.white.withValues(alpha: 0.12);
-  final glassButtonFill = Colors.white.withValues(alpha: 0.14);
+ThemeData _buildLightTheme() {
+  const fieldFill = Color(0xFFF2F4F8);
+  const border = AppColors.border;
 
   final colorScheme = ColorScheme.fromSeed(
-    seedColor: Colors.indigo,
-    brightness: Brightness.dark,
-  ).copyWith(surface: background);
+    seedColor: AppColors.blue,
+    brightness: Brightness.light,
+  ).copyWith(surface: AppColors.card, primary: AppColors.blue);
 
   final outlineBorder = OutlineInputBorder(
     borderRadius: BorderRadius.circular(12),
-    borderSide: BorderSide(color: glassBorder),
+    borderSide: const BorderSide(color: border),
   );
 
   final buttonShape = RoundedRectangleBorder(
     borderRadius: BorderRadius.circular(14),
-    side: BorderSide(color: glassBorder),
+    side: const BorderSide(color: border),
   );
 
   return ThemeData(
     useMaterial3: true,
-    brightness: Brightness.dark,
+    brightness: Brightness.light,
     colorScheme: colorScheme,
-    // 공용 배경 이미지가 MaterialApp.builder에서 그려지므로 Scaffold는 투명하게 둔다.
-    scaffoldBackgroundColor: Colors.transparent,
+    scaffoldBackgroundColor: AppColors.bg,
     appBarTheme: const AppBarTheme(
       backgroundColor: Colors.transparent,
       elevation: 0,
       scrolledUnderElevation: 0,
-      foregroundColor: Colors.white,
+      foregroundColor: AppColors.textPrimary,
     ),
     cardTheme: CardThemeData(
-      color: glassFill,
+      color: AppColors.card,
       elevation: 0,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
-        side: BorderSide(color: glassBorder),
+        side: const BorderSide(color: border),
       ),
     ),
-    dividerTheme: DividerThemeData(color: glassBorder),
+    dividerTheme: const DividerThemeData(color: border),
     listTileTheme: const ListTileThemeData(
-      iconColor: Colors.white70,
-      textColor: Colors.white,
+      iconColor: AppColors.textSecondary,
+      textColor: AppColors.textPrimary,
     ),
     inputDecorationTheme: InputDecorationTheme(
       filled: true,
-      fillColor: glassFill,
-      hintStyle: TextStyle(color: Colors.white.withValues(alpha: 0.5)),
-      labelStyle: TextStyle(color: Colors.white.withValues(alpha: 0.7)),
+      fillColor: fieldFill,
+      hintStyle: const TextStyle(color: AppColors.textSecondary),
+      labelStyle: const TextStyle(color: AppColors.textSecondary),
       border: outlineBorder,
       enabledBorder: outlineBorder,
       focusedBorder: outlineBorder.copyWith(
@@ -110,13 +101,13 @@ ThemeData _buildDarkTheme() {
       ),
     ),
     chipTheme: ChipThemeData(
-      backgroundColor: glassFill,
-      side: BorderSide(color: glassBorder),
-      labelStyle: const TextStyle(color: Colors.white),
+      backgroundColor: fieldFill,
+      side: const BorderSide(color: border),
+      labelStyle: const TextStyle(color: AppColors.textPrimary),
     ),
     filledButtonTheme: FilledButtonThemeData(
       style: FilledButton.styleFrom(
-        backgroundColor: glassButtonFill,
+        backgroundColor: AppColors.blue,
         foregroundColor: Colors.white,
         elevation: 0,
         shape: buttonShape,
@@ -124,7 +115,7 @@ ThemeData _buildDarkTheme() {
     ),
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
-        backgroundColor: glassButtonFill,
+        backgroundColor: AppColors.blue,
         foregroundColor: Colors.white,
         elevation: 0,
         shape: buttonShape,
@@ -132,14 +123,14 @@ ThemeData _buildDarkTheme() {
     ),
     outlinedButtonTheme: OutlinedButtonThemeData(
       style: OutlinedButton.styleFrom(
-        backgroundColor: glassFill,
-        foregroundColor: Colors.white,
-        side: BorderSide(color: glassBorder),
+        backgroundColor: AppColors.card,
+        foregroundColor: AppColors.textPrimary,
+        side: const BorderSide(color: border),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
       ),
     ),
     textButtonTheme: TextButtonThemeData(
-      style: TextButton.styleFrom(foregroundColor: Colors.white),
+      style: TextButton.styleFrom(foregroundColor: AppColors.blue),
     ),
   );
 }

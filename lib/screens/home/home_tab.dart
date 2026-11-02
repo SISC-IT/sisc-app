@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 
+import '../../theme/app_colors.dart';
 import '../../widgets/glass_bottom_nav_bar.dart';
 
 /// 세투연 홈 탭.
@@ -139,7 +140,7 @@ class HomeTab extends StatelessWidget {
               child: Column(
                 children: [
                   for (var i = 0; i < _events.length; i++) ...[
-                    if (i != 0) const Divider(height: 1, color: Color(0xFFEEF0F4)),
+                    if (i != 0) const Divider(height: 1, color: AppColors.border),
                     _EventRow(item: _events[i], onTap: () => _comingSoon(context, _events[i].title)),
                   ],
                 ],
@@ -171,21 +172,19 @@ class HomeTab extends StatelessWidget {
 // 디자인 토큰: 밝은 배경 · 흰 카드 · 파란 포인트
 // ---------------------------------------------------------------------------
 
-const Color _kBg = Color(0xFFF2F4F8);
-const Color _kCard = Colors.white;
-const Color _kBlue = Color(0xFF2F6FED);
-const Color _kBlueSoft = Color(0xFFEAF1FE);
-const Color _kTextPrimary = Color(0xFF171B22);
-const Color _kTextSecondary = Color(0xFF6E7480);
-const Color _kUp = Color(0xFFE0333D);
-const Color _kDown = Color(0xFF1FA971);
+const Color _kBg = AppColors.bg;
+const Color _kCard = AppColors.card;
+const Color _kBlue = AppColors.blue;
+const Color _kBlueSoft = AppColors.blueSoft;
+const Color _kTextPrimary = AppColors.textPrimary;
+const Color _kTextSecondary = AppColors.textSecondary;
+const Color _kUp = AppColors.up;
+const Color _kDown = AppColors.down;
 
 BoxDecoration _cardDecoration({double radius = 20}) => BoxDecoration(
   color: _kCard,
   borderRadius: BorderRadius.circular(radius),
-  boxShadow: [
-    BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 18, offset: const Offset(0, 8)),
-  ],
+  boxShadow: AppColors.cardShadow,
 );
 
 // ---------------------------------------------------------------------------

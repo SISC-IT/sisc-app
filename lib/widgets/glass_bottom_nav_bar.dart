@@ -2,6 +2,8 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 
+import '../theme/app_colors.dart';
+
 const double kGlassBottomBarHeight = 76;
 const double kGlassBottomBarMargin = 16;
 const double _kIconZoneHeight = 40;
@@ -132,7 +134,7 @@ class _GlassNavItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // 인디케이터가 항상 흰색이므로, 테마와 무관하게 흰 배경에서 또렷한 고정 색을 사용한다.
-    const activeColor = Colors.indigo;
+    const activeColor = AppColors.blue;
     const inactiveColor = Colors.black54;
     return MediaQuery(
       data: MediaQuery.of(context).copyWith(textScaler: TextScaler.noScaling),

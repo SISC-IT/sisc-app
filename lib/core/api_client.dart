@@ -1,6 +1,7 @@
 import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio/dio.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:path_provider/path_provider.dart';
 
 import 'config.dart';
@@ -25,10 +26,17 @@ class ApiClient {
   }
 
   static Future<ApiClient> init() async {
-    final supportDir = await getApplicationSupportDirectory();
-    final cookieJar = PersistCookieJar(
-      storage: FileStorage('${supportDir.path}/.cookies/'),
-    );
+    // path_provider/cookie_jar의 파일 저장소는 웹에서 지원되지 않으므로,
+    // 웹에서는 세션이 새로고침 시 유지되지 않는 메모리 쿠키 저장소를 쓴다.
+    final CookieJar cookieJar;
+    if (kIsWeb) {
+      cookieJar = CookieJar();
+    } else {
+      final supportDir = await getApplicationSupportDirectory();
+      cookieJar = PersistCookieJar(
+        storage: FileStorage('${supportDir.path}/.cookies/'),
+      );
+    }
 
     final dio = Dio(
       BaseOptions(
