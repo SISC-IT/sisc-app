@@ -8,7 +8,10 @@ import '../../widgets/glass_bottom_nav_bar.dart';
 /// 깔끔한 금융/투자 앱 톤(밝은 배경 · 흰색 카드 · 파란 포인트 · 둥근 모서리)으로
 /// 히어로 / 공지사항 / 오늘의 시장 / 빠른 메뉴 / 다가오는 일정 / 주요 소식 섹션을 담는다.
 class HomeTab extends StatelessWidget {
-  const HomeTab({super.key});
+  const HomeTab({super.key, required this.onOpenBoard});
+
+  /// 공지사항 카드를 탭했을 때 게시판 탭으로 전환한다.
+  final VoidCallback onOpenBoard;
 
   static const List<_MarketItem> _markets = [
     _MarketItem(
@@ -35,13 +38,6 @@ class HomeTab extends StatelessWidget {
       isUp: false,
       trend: [20, 18, 21, 16, 19, 14, 17, 12, 15, 10],
     ),
-  ];
-
-  static const List<_QuickMenuItem> _quickMenu = [
-    _QuickMenuItem(icon: Icons.bar_chart_rounded, label: '시장 분석'),
-    _QuickMenuItem(icon: Icons.school_rounded, label: '스터디 자료'),
-    _QuickMenuItem(icon: Icons.event_note_rounded, label: '행사 일정'),
-    _QuickMenuItem(icon: Icons.groups_rounded, label: '동아리 소개'),
   ];
 
   static const List<_EventItem> _events = [
@@ -108,9 +104,9 @@ class HomeTab extends StatelessWidget {
             const SizedBox(height: 20),
             const _HeroBanner(),
             const SizedBox(height: 20),
-            _NoticeCard(onTap: () => _comingSoon(context, '공지사항')),
+            _NoticeCard(onTap: onOpenBoard),
             const SizedBox(height: 28),
-            _SectionHeader(title: '오늘의 시장', onMore: () => _comingSoon(context, '시장 분석')),
+            const _SectionHeader(title: '오늘의 시장'),
             const SizedBox(height: 12),
             Row(
               children: [
@@ -121,19 +117,7 @@ class HomeTab extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 28),
-            Row(
-              children: [
-                for (var i = 0; i < _quickMenu.length; i++)
-                  Expanded(
-                    child: _QuickMenuButton(
-                      item: _quickMenu[i],
-                      onTap: () => _comingSoon(context, _quickMenu[i].label),
-                    ),
-                  ),
-              ],
-            ),
-            const SizedBox(height: 28),
-            _SectionHeader(title: '다가오는 일정', onMore: () => _comingSoon(context, '행사 일정')),
+            const _SectionHeader(title: '다가오는 일정'),
             const SizedBox(height: 12),
             _SectionCard(
               padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -141,13 +125,13 @@ class HomeTab extends StatelessWidget {
                 children: [
                   for (var i = 0; i < _events.length; i++) ...[
                     if (i != 0) const Divider(height: 1, color: AppColors.border),
-                    _EventRow(item: _events[i], onTap: () => _comingSoon(context, _events[i].title)),
+                    _EventRow(item: _events[i]),
                   ],
                 ],
               ),
             ),
             const SizedBox(height: 28),
-            _SectionHeader(title: '주요 소식', onMore: () => _comingSoon(context, '주요 소식')),
+            const _SectionHeader(title: '주요 소식'),
             const SizedBox(height: 12),
             SizedBox(
               height: 168,
@@ -155,10 +139,7 @@ class HomeTab extends StatelessWidget {
                 scrollDirection: Axis.horizontal,
                 itemCount: _news.length,
                 separatorBuilder: (_, _) => const SizedBox(width: 12),
-                itemBuilder: (context, index) => _NewsCard(
-                  item: _news[index],
-                  onTap: () => _comingSoon(context, _news[index].title),
-                ),
+                itemBuilder: (context, index) => _NewsCard(item: _news[index]),
               ),
             ),
           ],
@@ -334,38 +315,17 @@ class _NoticeCard extends StatelessWidget {
 }
 
 // ---------------------------------------------------------------------------
-// 섹션 헤더 ("더보기" 포함)
+// 섹션 헤더
 // ---------------------------------------------------------------------------
 
 class _SectionHeader extends StatelessWidget {
-  const _SectionHeader({required this.title, this.onMore});
+  const _SectionHeader({required this.title});
 
   final String title;
-  final VoidCallback? onMore;
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(title, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: _kTextPrimary)),
-        if (onMore != null)
-          InkWell(
-            borderRadius: BorderRadius.circular(12),
-            onTap: onMore,
-            child: const Padding(
-              padding: EdgeInsets.symmetric(vertical: 4, horizontal: 4),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text('더보기', style: TextStyle(fontSize: 13, color: _kTextSecondary, fontWeight: FontWeight.w600)),
-                  Icon(Icons.chevron_right_rounded, size: 16, color: _kTextSecondary),
-                ],
-              ),
-            ),
-          ),
-      ],
-    );
+    return Text(title, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: _kTextPrimary));
   }
 }
 
@@ -502,53 +462,6 @@ class _Sparkline extends StatelessWidget {
 }
 
 // ---------------------------------------------------------------------------
-// 빠른 메뉴
-// ---------------------------------------------------------------------------
-
-class _QuickMenuItem {
-  const _QuickMenuItem({required this.icon, required this.label});
-
-  final IconData icon;
-  final String label;
-}
-
-class _QuickMenuButton extends StatelessWidget {
-  const _QuickMenuButton({required this.item, required this.onTap});
-
-  final _QuickMenuItem item;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      borderRadius: BorderRadius.circular(16),
-      onTap: onTap,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 8),
-        child: Column(
-          children: [
-            Container(
-              width: 52,
-              height: 52,
-              decoration: const BoxDecoration(color: _kBlueSoft, shape: BoxShape.circle),
-              child: Icon(item.icon, color: _kBlue, size: 24),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              item.label,
-              textAlign: TextAlign.center,
-              style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: _kTextPrimary),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-// ---------------------------------------------------------------------------
 // 다가오는 일정
 // ---------------------------------------------------------------------------
 
@@ -571,60 +484,55 @@ class _EventItem {
 }
 
 class _EventRow extends StatelessWidget {
-  const _EventRow({required this.item, required this.onTap});
+  const _EventRow({required this.item});
 
   final _EventItem item;
-  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 12),
-        child: Row(
-          children: [
-            Container(
-              width: 50,
-              padding: const EdgeInsets.symmetric(vertical: 8),
-              decoration: BoxDecoration(color: _kBlueSoft, borderRadius: BorderRadius.circular(12)),
-              child: Column(
-                children: [
-                  Text(item.month, style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: _kBlue)),
-                  Text(item.day, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: _kBlue)),
-                ],
-              ),
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 12),
+      child: Row(
+        children: [
+          Container(
+            width: 50,
+            padding: const EdgeInsets.symmetric(vertical: 8),
+            decoration: BoxDecoration(color: _kBlueSoft, borderRadius: BorderRadius.circular(12)),
+            child: Column(
+              children: [
+                Text(item.month, style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: _kBlue)),
+                Text(item.day, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: _kBlue)),
+              ],
             ),
-            const SizedBox(width: 14),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Flexible(
-                        child: Text(
-                          item.title,
-                          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: _kTextPrimary),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Flexible(
+                      child: Text(
+                        item.title,
+                        style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: _kTextPrimary),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
-                      const SizedBox(width: 6),
-                      _Tag(label: item.tag),
-                    ],
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    '${item.time} · ${item.location}',
-                    style: const TextStyle(fontSize: 12, color: _kTextSecondary),
-                  ),
-                ],
-              ),
+                    ),
+                    const SizedBox(width: 6),
+                    _Tag(label: item.tag),
+                  ],
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  '${item.time} · ${item.location}',
+                  style: const TextStyle(fontSize: 12, color: _kTextSecondary),
+                ),
+              ],
             ),
-            const Icon(Icons.chevron_right_rounded, color: _kTextSecondary, size: 20),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -658,45 +566,40 @@ class _NewsItem {
 }
 
 class _NewsCard extends StatelessWidget {
-  const _NewsCard({required this.item, required this.onTap});
+  const _NewsCard({required this.item});
 
   final _NewsItem item;
-  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      borderRadius: BorderRadius.circular(18),
-      onTap: onTap,
-      child: Container(
-        width: 150,
-        padding: const EdgeInsets.all(12),
-        decoration: _cardDecoration(radius: 18),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(
-              height: 64,
-              width: double.infinity,
-              decoration: BoxDecoration(
-                gradient: const LinearGradient(colors: [_kBlueSoft, Colors.white]),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Icon(item.icon, color: _kBlue, size: 26),
+    return Container(
+      width: 150,
+      padding: const EdgeInsets.all(12),
+      decoration: _cardDecoration(radius: 18),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            height: 64,
+            width: double.infinity,
+            decoration: BoxDecoration(
+              gradient: const LinearGradient(colors: [_kBlueSoft, Colors.white]),
+              borderRadius: BorderRadius.circular(12),
             ),
-            const SizedBox(height: 10),
-            Expanded(
-              child: Text(
-                item.title,
-                style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.w700, color: _kTextPrimary, height: 1.3),
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-              ),
+            child: Icon(item.icon, color: _kBlue, size: 26),
+          ),
+          const SizedBox(height: 10),
+          Expanded(
+            child: Text(
+              item.title,
+              style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.w700, color: _kTextPrimary, height: 1.3),
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
             ),
-            const SizedBox(height: 4),
-            Text(item.date, style: const TextStyle(fontSize: 10.5, color: _kTextSecondary)),
-          ],
-        ),
+          ),
+          const SizedBox(height: 4),
+          Text(item.date, style: const TextStyle(fontSize: 10.5, color: _kTextSecondary)),
+        ],
       ),
     );
   }

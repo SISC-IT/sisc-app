@@ -21,7 +21,7 @@ class _HomeScreenState extends State<HomeScreen> {
   int _index = 0;
 
   late final List<Widget> _tabs = [
-    const HomeTab(),
+    HomeTab(onOpenBoard: () => setState(() => _index = 1)),
     BoardScreen(authState: widget.authState),
     AttendanceHistoryScreen(authState: widget.authState),
     const TradingTab(),
